@@ -30,7 +30,6 @@ func (g *GoogleISBN) GetInfo(isbn string) (bookInfo *BookInfo, err error) {
 	if err := json.Unmarshal(resBytes, &bookInfo); err != nil {
 		return nil, err
 	}
-
 	return
 }
 
