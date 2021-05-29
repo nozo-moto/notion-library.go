@@ -1,8 +1,8 @@
 package google_isbn
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -18,8 +18,20 @@ func New() *GoogleISBN {
 	return &GoogleISBN{}
 }
 
-func (g *GoogleISBN) GetInfo(isbn string) (bookInfo *BookInfo, err error) {
-	resp, err := http.Get(fmt.Sprintf("%s%s", BaseURL, isbn))
+func (g *GoogleISBN) GetInfo(ctx context.Context, isbn string) (bookInfo *BookInfo, err error) {
+	req, err := http.NewRequest(
+		"GET",
+		BaseURL,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	req.WithContext(ctx)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}

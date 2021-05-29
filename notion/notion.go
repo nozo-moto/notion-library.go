@@ -2,6 +2,7 @@ package notion
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -135,7 +136,7 @@ type BookShelf struct {
 	} `json:"properties"`
 }
 
-func (n *Notion) PostToDB(bookShelfInfo *BookShelf) error {
+func (n *Notion) PostToDB(ctx context.Context, bookShelfInfo *BookShelf) error {
 	bookShelfBytes, err := json.Marshal(bookShelfInfo)
 	if err != nil {
 		return err
@@ -148,25 +149,22 @@ func (n *Notion) PostToDB(bookShelfInfo *BookShelf) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(bookShelfBytes))
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Notion-Version", "2021-05-13")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", n.accesstoken))
-	fmt.Println(req.Header)
+	req.WithContext(ctx)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}
-	res, err := io.ReadAll(resp.Body)
+	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(res))
 	defer resp.Body.Close()
-	fmt.Println(resp.StatusCode)
 
 	return nil
 }

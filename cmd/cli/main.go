@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -24,13 +25,14 @@ func main() {
 	googleISBN := google_isbn.New()
 	notion := notion.New(notionAccessToken)
 
-	bookInfo, err := googleISBN.GetInfo(isbn)
+	bookInfo, err := googleISBN.GetInfo(context.Background(), isbn)
 	if err != nil {
 		panic(err)
 	}
 
 	bookInfoVolume := bookInfo.Items[0].Volumeinfo
 	if err := notion.PostToDB(
+		context.Background(),
 		notion.NewBookShelf(
 			notionPageId,
 			isbn,
